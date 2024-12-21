@@ -108,7 +108,7 @@ jobs:
    
     - name: Substitute variables in the Kubernetes YAML template
       env:
-        IDENTITY_CLIENT_ID: ${{ secrets.IDENTITY_CLIENT_ID }}
+        CATALOG_CLIENT_ID: ${{ secrets.CATALOG_CLIENT_ID }}        
         DOCKER_IMAGE: ${{ env.docker_image_tag }}
       run: envsubst < ./kubernetes/catalog.yaml > ./kubernetes/catalog-updated.yaml
 
