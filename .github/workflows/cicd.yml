@@ -119,37 +119,3 @@ jobs:
       run: |
           kubectl create namespace catalog || echo "Namespace already exists"          
           kubectl apply -f ./kubernetes/catalog-updated.yaml -n catalog
-
-  #create workload identity
-  AssignPodManagedIdentity:
-    runs-on: ubuntu-latest
-    needs: deploy-microservice
-  
-    permissions:
-      id-token: write
-      contents: read
-  
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-  
-        
-  
-      - name: Azure Login
-        uses: Azure/login@v1
-        with:            
-            client-id: ${{secrets.SERVICE_PRINCIPAL_CLIENT_ID}}
-            tenant-id: ${{secrets.TENANT_ID}}            
-            subscription-id: ${{secrets.SUBSCRIPTION_ID}}   
-        
-      - name: Set up Azure CLI and run commands
-        uses: azure/CLI@v1
-        with:
-          inlineScript: |        
-            appname=${{ secrets.APP_NAME }}
-            namespace=catalog
-            az config set extension.dynamic_install_allow_preview=true
-            az aks update --enable-pod-identity --resource-group $appname --name $appname
-            IDENTITY_RESOURCE_ID=$(az identity show -g $appname -n $namespace --query id -otsv)
-            az aks pod-identity add --resource-group $appname --cluster-name $appname --namespace $namespace --name $namespace --identity-resource-id $IDENTITY_RESOURCE_ID
-  
